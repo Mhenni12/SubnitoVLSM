@@ -267,19 +267,20 @@ public class Subnito extends JFrame {
     private void showError(String message) {
         JOptionPane.showMessageDialog(this, message, "Input Validation Error", JOptionPane.ERROR_MESSAGE);
     }
-    
+
     private void openSubnetsCreation() {
-        // Create and show SubnetsCreation frame
+        // Create and show SubnetsInput frame
         SwingUtilities.invokeLater(() -> {
             try {
-                SubnetsCreation subnetsFrame = new SubnetsCreation(
+                dispose(); // Close main window
+                SubnetsInput subnetsInputFrame = new SubnetsInput(
                     ipAddressField.getText().trim(),
                     networkMaskField.getText().trim(),
                     Integer.parseInt(subnetsNumberField.getText().trim())
                 );
-                subnetsFrame.setVisible(true);
+                subnetsInputFrame.setVisible(true);
             } catch (Exception e) {
-                showError("Error opening Subnets Creation window: " + e.getMessage());
+                showError("Error opening Subnets Input window: " + e.getMessage());
             }
         });
     }
