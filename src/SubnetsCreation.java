@@ -10,15 +10,15 @@ import java.util.List;
 public class SubnetsCreation extends JFrame {
     private String ipAddress;
     private String networkMask;
-    private int subnetsNumber;
+    private Subnet[] subnets;
     private JTable subnetsTable;
     private DefaultTableModel tableModel;
     private JLabel networkInfoLabel;
     
-    public SubnetsCreation(String ipAddress, String networkMask, int subnetsNumber) {
+    public SubnetsCreation(String ipAddress, String networkMask, Subnet[] subnets) {
         this.ipAddress = ipAddress;
         this.networkMask = networkMask;
-        this.subnetsNumber = subnetsNumber;
+        this.subnets = subnets;
         
         initializeComponents();
         calculateSubnets();
@@ -29,8 +29,8 @@ public class SubnetsCreation extends JFrame {
     private void initializeComponents() {
         // Create table model
         String[] columnNames = {
-            "Subnet #", "Network Address", "Subnet Mask", "First Host", 
-            "Last Host", "Broadcast Address", "Total Hosts"
+            "Subnet Name", "Required Hosts", "Network Address", "Subnet Mask", 
+            "First Host", "Last Host", "Broadcast Address", "Available Hosts"
         };
         
         tableModel = new DefaultTableModel(columnNames, 0) {
@@ -78,73 +78,102 @@ public class SubnetsCreation extends JFrame {
     }
     
     private void calculateSubnets() {
-        try {
-            // Parse network mask to get CIDR
-            int cidr = parseMaskToCIDR(networkMask);
-            
-            // Calculate subnet information
-            String[] ipParts = ipAddress.split("\\.");
-            long networkAddress = 0;
-            for (int i = 0; i < 4; i++) {
-                networkAddress = (networkAddress << 8) + Integer.parseInt(ipParts[i]);
-            }
-            
-            // Apply network mask to get actual network address
-            long mask = (-1L << (32 - cidr)) & 0xFFFFFFFFL;
-            networkAddress = networkAddress & mask;
-            
-            // Calculate bits needed for subnets
-            int subnetBits = (int) Math.ceil(Math.log(subnetsNumber) / Math.log(2));
-            int newCIDR = cidr + subnetBits;
-            
-            if (newCIDR > 30) {
-                JOptionPane.showMessageDialog(this, 
-                    "Too many subnets requested for the given network!\n" +
-                    "Maximum possible subnets: " + (1 << (30 - cidr)),
-                    "Subnet Calculation Error", 
-                    JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            // Update network info
-            networkInfoLabel.setText(String.format(
-                "Original Network: %s/%d | Subnet Mask: /%d | Available Subnets: %d | Required: %d",
-                longToIP(networkAddress), cidr, newCIDR, (1 << subnetBits), subnetsNumber
-            ));
-            
-            // Calculate each subnet
-            long subnetSize = 1L << (32 - newCIDR);
-            long currentNetwork = networkAddress;
-            
-            for (int i = 0; i < subnetsNumber; i++) {
-                String subnetNetwork = longToIP(currentNetwork);
-                String subnetMask = cidrToMask(newCIDR);
-                String firstHost = longToIP(currentNetwork + 1);
-                String lastHost = longToIP(currentNetwork + subnetSize - 2);
-                String broadcast = longToIP(currentNetwork + subnetSize - 1);
-                int totalHosts = (int) (subnetSize - 2); // Exclude network and broadcast
-                
-                Object[] rowData = {
-                    "Subnet " + (i + 1),
-                    subnetNetwork,
-                    subnetMask,
-                    firstHost,
-                    lastHost,
-                    broadcast,
-                    totalHosts
-                };
-                
-                tableModel.addRow(rowData);
-                currentNetwork += subnetSize;
-            }
-            
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, 
-                "Error calculating subnets: " + e.getMessage(),
-                "Calculation Error", 
-                JOptionPane.ERROR_MESSAGE);
+    try {
+        // Sort subnets by required hosts in descending order (VLSM requirement)
+        java.util.Arrays.sort(subnets, (a, b) -> Integer.compare(b.getHotes(), a.getHotes()));
+        
+        // Parse network mask to get CIDR
+        int cidr = parseMaskToCIDR(networkMask);
+        
+        // Calculate total available hosts in the network
+        long totalAvailableHosts = (1L << (32 - cidr)) - 2;
+        
+        // Calculate total required hosts
+        int totalRequiredHosts = 0;
+        for (Subnet subnet : subnets) {
+            totalRequiredHosts += subnet.getHotes();
         }
+        
+        // Check if we have enough space
+        if (totalRequiredHosts > totalAvailableHosts) {
+            JOptionPane.showMessageDialog(this, 
+                "Not enough address space for the requested subnets!\n" +
+                "Available hosts: " + totalAvailableHosts + "\n" +
+                "Required hosts: " + totalRequiredHosts,
+                "Subnet Calculation Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Convert IP address to long
+        String[] ipParts = ipAddress.split("\\.");
+        long networkAddress = 0;
+        for (int i = 0; i < 4; i++) {
+            networkAddress = (networkAddress << 8) + Integer.parseInt(ipParts[i]);
+        }
+        
+        // Apply network mask to get actual network address
+        long mask = (-1L << (32 - cidr)) & 0xFFFFFFFFL;
+        networkAddress = networkAddress & mask;
+        
+        long currentNetwork = networkAddress;
+        
+        // Calculate each subnet
+        for (int i = 0; i < subnets.length; i++) {
+            Subnet subnet = subnets[i];
+            int requiredHosts = subnet.getHotes();
+            
+            // Calculate bits needed for hosts (hostBits) and new CIDR
+            int hostBits = (int) Math.ceil(Math.log(requiredHosts + 2) / Math.log(2));
+            int subnetCIDR = 32 - hostBits;
+            
+            // Calculate subnet size
+            long subnetSize = 1L << hostBits;
+            
+            // Check if subnet fits in remaining space
+            if ((currentNetwork & 0xFF) + subnetSize > 256) {
+                // Move to next octet if current one is full
+                currentNetwork = ((currentNetwork >> 8) + 1) << 8;
+            }
+            
+            // Set subnet properties
+            subnet.setAddresseReseau(longToIP(currentNetwork));
+            subnet.setMasque(subnetCIDR);
+            subnet.setAddresseBroadcast(longToIP(currentNetwork + subnetSize - 1));
+            subnet.setPremAddUtilisable(longToIP(currentNetwork + 1));
+            subnet.setDernAddUtilisable(longToIP(currentNetwork + subnetSize - 2));
+            
+            // Add to table
+            Object[] rowData = {
+                subnet.getName(),
+                requiredHosts,
+                subnet.getAddresseReseau(),
+                cidrToMask(subnetCIDR),
+                subnet.getPremAddUtilisable(),
+                subnet.getDernAddUtilisable(),
+                subnet.getAddresseBroadcast(),
+                subnetSize - 2  // Available hosts
+            };
+            
+            tableModel.addRow(rowData);
+            
+            // Move to next subnet
+            currentNetwork += subnetSize;
+        }
+        
+        // Update network info
+        networkInfoLabel.setText(String.format(
+            "Original Network: %s/%d | Total Available Hosts: %d | Total Required Hosts: %d",
+            longToIP(networkAddress), cidr, totalAvailableHosts, totalRequiredHosts
+        ));
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, 
+            "Error calculating subnets: " + e.getMessage(),
+            "Calculation Error", 
+            JOptionPane.ERROR_MESSAGE);
     }
+}
     
     private int parseMaskToCIDR(String mask) {
         try {
@@ -366,35 +395,5 @@ public class SubnetsCreation extends JFrame {
         setLocationRelativeTo(null);
         setResizable(true);
         setMinimumSize(new Dimension(800, 500));
-        
-        // Set application icon
-        try {
-            setIconImage(createAppIcon());
-        } catch (Exception e) {
-            System.err.println("Could not set application icon: " + e.getMessage());
-        }
-    }
-    
-    private Image createAppIcon() {
-        // Create a simple icon programmatically
-        java.awt.image.BufferedImage icon = new java.awt.image.BufferedImage(32, 32, java.awt.image.BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = icon.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        // Draw a green circle
-        g2d.setColor(new Color(76, 175, 80));
-        g2d.fillOval(4, 4, 24, 24);
-        
-        // Draw "S" for Subnito
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 18));
-        FontMetrics fm = g2d.getFontMetrics();
-        String text = "S";
-        int x = (32 - fm.stringWidth(text)) / 2;
-        int y = (32 - fm.getHeight()) / 2 + fm.getAscent();
-        g2d.drawString(text, x, y);
-        
-        g2d.dispose();
-        return icon;
     }
 }
