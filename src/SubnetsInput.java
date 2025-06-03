@@ -367,39 +367,22 @@ public class SubnetsInput extends JFrame {
         int maxHeight = 800;
         int finalHeight = Math.min(calculatedHeight, maxHeight);
         
-        setSize(700, finalHeight);
+        setSize(800, finalHeight);
         setLocationRelativeTo(null);
         setResizable(true);
         setMinimumSize(new Dimension(600, 400));
-        
-        // Set application icon
-        try {
-            setIconImage(createAppIcon());
-        } catch (Exception e) {
-            System.err.println("Could not set application icon: " + e.getMessage());
-        }
     }
-    
-    private Image createAppIcon() {
-        // Create a simple icon programmatically
-        java.awt.image.BufferedImage icon = new java.awt.image.BufferedImage(32, 32, java.awt.image.BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = icon.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        public static void main(String[] args) {
+        // Set system look and feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getLookAndFeel());
+        } catch (Exception e) {
+            System.err.println("Could not set system look and feel: " + e.getMessage());
+        }
         
-        // Draw a green circle
-        g2d.setColor(new Color(76, 175, 80));
-        g2d.fillOval(4, 4, 24, 24);
-        
-        // Draw "S" for Subnito
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 18));
-        FontMetrics fm = g2d.getFontMetrics();
-        String text = "S";
-        int x = (32 - fm.stringWidth(text)) / 2;
-        int y = (32 - fm.getHeight()) / 2 + fm.getAscent();
-        g2d.drawString(text, x, y);
-        
-        g2d.dispose();
-        return icon;
+        SwingUtilities.invokeLater(() -> {
+            new SubnetsInput("192.168.1.1", "24", 3).setVisible(true);
+        });
     }
 }

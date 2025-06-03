@@ -300,7 +300,7 @@ public class Subnito extends JFrame {
     private void setupWindow() {
         setTitle("Subnito - VLSM Calculator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 700);
+        setSize(800, 600);
         setLocationRelativeTo(null);
         setResizable(false);
     }

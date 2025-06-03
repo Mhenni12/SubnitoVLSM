@@ -138,17 +138,17 @@ public class About extends JFrame {
         setResizable(true);
     }
     
-
-        public static void main(String[] args) {
-        // Set system look and feel
-        try {
-            UIManager.setLookAndFeel(UIManager.getLookAndFeel());
-        } catch (Exception e) {
-            System.err.println("Could not set system look and feel: " + e.getMessage());
-        }
-        
-        SwingUtilities.invokeLater(() -> {
-            new About().setVisible(true);
-        });
+    //! For testing purposes
+    public static void main(String[] args) {
+    // Set system look and feel
+    try {
+        UIManager.setLookAndFeel(UIManager.getLookAndFeel());
+    } catch (Exception e) {
+        System.err.println("Could not set system look and feel: " + e.getMessage());
+    }
+    
+    SwingUtilities.invokeLater(() -> {
+        new About().setVisible(true);
+    });
     }
 }
