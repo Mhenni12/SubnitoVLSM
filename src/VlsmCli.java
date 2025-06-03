@@ -2,124 +2,124 @@ import java.util.Comparator;
 import java.util.Scanner;
 import java.util.Arrays;
 
-class Subnet {
-    private String name;
-    private String addresseReseau;
-    private String addresseBroadcast;
-    private String premAddUtilisable;
-    private String dernAddUtilisable;
-    private int masque;
-    private int hotes;
-    private String originalName; // Store the original custom name
+// class Subnet {
+//     private String name;
+//     private String addresseReseau;
+//     private String addresseBroadcast;
+//     private String premAddUtilisable;
+//     private String dernAddUtilisable;
+//     private int masque;
+//     private int hotes;
+//     private String originalName; // Store the original custom name
 
-    // Constructor with validation
-    Subnet(String name, int hotes) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Le nom du subnet ne peut pas être null ou vide.");
-        }
-        if (hotes <= 0) {
-            throw new IllegalArgumentException("Le nombre d'hôtes doit être positif. Valeur donnée: " + hotes);
-        }
-        if (hotes > 1073741822) { // 2^30 - 2 (maximum theoretical hosts)
-            throw new IllegalArgumentException("Le nombre d'hôtes est trop grand. Maximum théorique: 1073741822");
-        }
-        this.name = name.trim();
-        this.originalName = name.trim(); // Store original name
-        this.hotes = hotes;
-    }
+//     // Constructor with validation
+//     Subnet(String name, int hotes) {
+//         if (name == null || name.trim().isEmpty()) {
+//             throw new IllegalArgumentException("Le nom du subnet ne peut pas être null ou vide.");
+//         }
+//         if (hotes <= 0) {
+//             throw new IllegalArgumentException("Le nombre d'hôtes doit être positif. Valeur donnée: " + hotes);
+//         }
+//         if (hotes > 1073741822) { // 2^30 - 2 (maximum theoretical hosts)
+//             throw new IllegalArgumentException("Le nombre d'hôtes est trop grand. Maximum théorique: 1073741822");
+//         }
+//         this.name = name.trim();
+//         this.originalName = name.trim(); // Store original name
+//         this.hotes = hotes;
+//     }
 
-    // Setters with validation
-    void setName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Le nom du subnet ne peut pas être null ou vide.");
-        }
-        this.name = name.trim();
-    }
+//     // Setters with validation
+//     void setName(String name) {
+//         if (name == null || name.trim().isEmpty()) {
+//             throw new IllegalArgumentException("Le nom du subnet ne peut pas être null ou vide.");
+//         }
+//         this.name = name.trim();
+//     }
 
-    void setAddresseReseau(String addresseReseau) {
-        if (addresseReseau == null || !isValidIpAddress(addresseReseau)) {
-            throw new IllegalArgumentException("Adresse réseau invalide: " + addresseReseau);
-        }
-        this.addresseReseau = addresseReseau;
-    }
+//     void setAddresseReseau(String addresseReseau) {
+//         if (addresseReseau == null || !isValidIpAddress(addresseReseau)) {
+//             throw new IllegalArgumentException("Adresse réseau invalide: " + addresseReseau);
+//         }
+//         this.addresseReseau = addresseReseau;
+//     }
 
-    void setAddresseBroadcast(String addresseBroadcast) {
-        if (addresseBroadcast == null || !isValidIpAddress(addresseBroadcast)) {
-            throw new IllegalArgumentException("Adresse broadcast invalide: " + addresseBroadcast);
-        }
-        this.addresseBroadcast = addresseBroadcast;
-    }
+//     void setAddresseBroadcast(String addresseBroadcast) {
+//         if (addresseBroadcast == null || !isValidIpAddress(addresseBroadcast)) {
+//             throw new IllegalArgumentException("Adresse broadcast invalide: " + addresseBroadcast);
+//         }
+//         this.addresseBroadcast = addresseBroadcast;
+//     }
 
-    void setPremAdd(String premAddUtilisable) {
-        if (premAddUtilisable == null || !isValidIpAddress(premAddUtilisable)) {
-            throw new IllegalArgumentException("Première adresse utilisable invalide: " + premAddUtilisable);
-        }
-        this.premAddUtilisable = premAddUtilisable;
-    }
+//     void setPremAdd(String premAddUtilisable) {
+//         if (premAddUtilisable == null || !isValidIpAddress(premAddUtilisable)) {
+//             throw new IllegalArgumentException("Première adresse utilisable invalide: " + premAddUtilisable);
+//         }
+//         this.premAddUtilisable = premAddUtilisable;
+//     }
 
-    void setDernAdd(String dernAddUtilisable) {
-        if (dernAddUtilisable == null || !isValidIpAddress(dernAddUtilisable)) {
-            throw new IllegalArgumentException("Dernière adresse utilisable invalide: " + dernAddUtilisable);
-        }
-        this.dernAddUtilisable = dernAddUtilisable;
-    }
+//     void setDernAdd(String dernAddUtilisable) {
+//         if (dernAddUtilisable == null || !isValidIpAddress(dernAddUtilisable)) {
+//             throw new IllegalArgumentException("Dernière adresse utilisable invalide: " + dernAddUtilisable);
+//         }
+//         this.dernAddUtilisable = dernAddUtilisable;
+//     }
 
-    void setMasque(int masque) {
-        if (masque < 0 || masque > 32) {
-            throw new IllegalArgumentException("Masque invalide: " + masque + ". Doit être entre 0 et 32.");
-        }
-        this.masque = masque;
-    }
+//     void setMasque(int masque) {
+//         if (masque < 0 || masque > 32) {
+//             throw new IllegalArgumentException("Masque invalide: " + masque + ". Doit être entre 0 et 32.");
+//         }
+//         this.masque = masque;
+//     }
 
-    // Helper method for IP validation
-    private boolean isValidIpAddress(String ip) {
-        if (ip == null) return false;
-        String[] parts = ip.split("\\.");
-        if (parts.length != 4) return false;
-        try {
-            for (String part : parts) {
-                int value = Integer.parseInt(part);
-                if (value < 0 || value > 255) return false;
-            }
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
+//     // Helper method for IP validation
+//     private boolean isValidIpAddress(String ip) {
+//         if (ip == null) return false;
+//         String[] parts = ip.split("\\.");
+//         if (parts.length != 4) return false;
+//         try {
+//             for (String part : parts) {
+//                 int value = Integer.parseInt(part);
+//                 if (value < 0 || value > 255) return false;
+//             }
+//             return true;
+//         } catch (NumberFormatException e) {
+//             return false;
+//         }
+//     }
 
-    // Getters
-    int getHosts() {
-        return hotes;
-    }
+//     // Getters
+//     int getHosts() {
+//         return hotes;
+//     }
 
-    String getName() {
-        return name;
-    }
+//     String getName() {
+//         return name;
+//     }
 
-    String getOriginalName() {
-        return originalName;
-    }
+//     String getOriginalName() {
+//         return originalName;
+//     }
 
-    String getAddresseReseau() {
-        return addresseReseau;
-    }
+//     String getAddresseReseau() {
+//         return addresseReseau;
+//     }
 
-    String getAddresseBroadcast() {
-        return addresseBroadcast;
-    }
+//     String getAddresseBroadcast() {
+//         return addresseBroadcast;
+//     }
 
-    String getPremAddUtilisable() {
-        return premAddUtilisable;
-    }
+//     String getPremAddUtilisable() {
+//         return premAddUtilisable;
+//     }
 
-    String getDernAddUtilisable() {
-        return dernAddUtilisable;
-    }
+//     String getDernAddUtilisable() {
+//         return dernAddUtilisable;
+//     }
 
-    int getMasque() {
-        return masque;
-    }
-}
+//     int getMasque() {
+//         return masque;
+//     }
+// }
 
 public class VlsmCli {
     private static final int MAX_SUBNETS = 1000;
