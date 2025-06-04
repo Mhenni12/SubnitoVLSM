@@ -132,31 +132,11 @@ public class SubnetsInput extends JFrame {
         // Custom home button with house icon
         JPanel homePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         homePanel.setOpaque(false);
+
+        ImageIcon logoIcon = new ImageIcon("SubnitoApp/src/images/icons8-home-50.png");
         
-        JButton customHomeButton = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                // Draw house icon
-                g2d.setColor(new Color(76, 175, 80));
-                g2d.setStroke(new BasicStroke(2));
-                
-                // House base
-                int[] xPoints = {8, 20, 32, 32, 8, 8};
-                int[] yPoints = {20, 8, 20, 32, 32, 20};
-                g2d.drawPolygon(xPoints, yPoints, 6);
-                
-                // Door
-                g2d.drawRect(16, 24, 8, 8);
-                
-                // Roof line
-                g2d.drawLine(8, 20, 20, 8);
-                g2d.drawLine(20, 8, 32, 20);
-            }
-        };
+        JButton customHomeButton = new JButton(logoIcon) ;
+
         
         customHomeButton.setPreferredSize(new Dimension(40, 40));
         customHomeButton.setBackground(Color.WHITE);
