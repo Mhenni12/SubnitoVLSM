@@ -1,20 +1,4 @@
-<<<<<<< HEAD
-## Getting Started
+## Subnito-VLSM-calculator
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
-
-## Folder Structure
-
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+Subnito is a smart and intuitive VLSM (Variable Length Subnet Masking) calculator built to make subnetting fast, accurate, and hassle-free. With traditional subnetting, networks are often split into equal-sized blocks—leading to wasted IP addresses. VLSM solves this by allowing different subnet sizes within the same network, giving you greater flexibility and efficiency in IP allocation. Subnito helps you: Calculate optimal subnets based on your IP and host requirements. Visualize IP ranges, subnet masks, broadcast addresses, and more. Save time and avoid manual errors in subnetting tasks. Learn and apply efficient network design principles. Whether you're a networking student, sysadmin, or IT professional, Subnito is your go-to tool for clean, precise subnet planning. Subnet smart. Subnet fast. Subnet with Subnito.
 
